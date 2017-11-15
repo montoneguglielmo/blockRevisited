@@ -1,0 +1,19 @@
+BLOCK is an object with:
+output_size
+input_size
+forward
+block_params
+state (the output of all the internal layers)
+subBlockList
+
+FUNDAMENTALBLOCKS is an object:
+it can be a CNN layer or a FFW layer
+must know how to reshape the input accoring to where is receiveing the input from
+params
+state?
+
+blk1 :or define a layer----or load an entrie block---or load a subblock
+NetworkConfig: { 'blk1':{'input':[blk23, blk44], 'output':[blk10, blk12]}}
+
+
+something for visualizing the block and their connections is needed
