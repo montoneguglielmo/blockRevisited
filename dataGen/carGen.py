@@ -11,8 +11,8 @@ from dataGenerator import *
 class dataGenerator(dataGeneratorPrototip):
 
     def __init__(self, **kwargs):
-        self.datafiles  = ["../dataset/car/Mr_Blue/caffe_z2_color_direct_Smyth_tape_single_transmitter_11Feb17_13h47m27s_Mr_Blue.hdf5"]
-        self.batch_size = 20
+        self.datafiles  = ["../dataset/car/Mr_Blue/caffe_direct_local_sidewalks_05Dec16_15h03m35s_Mr_Blue.hdf5", "../dataset/car/Mr_Blue/direct_local_17Dec16_16h29m16s_Mr_Blue.hdf5", "../dataset/car/Mr_Blue/direct_home_06Dec16_16h01m42s_Mr_Blue.hdf5", "../dataset/car/Mr_Blue/direct_31Aug2016_Mr_Blue_sidewalks_2.hdf5", "../dataset/car/Mr_Blue/direct_31Aug2016_Mr_Blue_sidewalks_1.hdf5", "../dataset/car/Mr_Blue/direct_home_06Dec16_08h10m47s_Mr_Blue.hdf5", "../dataset/car/Mr_Blue/direct_racing_Tilden_27Nov16_11h08m39s_Mr_Blue.hdf5", "../dataset/car/Mr_Blue/direct_racing_Tilden_27Nov16_12h20m21s_Mr_Blue.hdf5", "../dataset/car/Mr_Blue/direct_racing_Tilden_27Nov16_13h28m00s_Mr_Blue.hdf5", "../dataset/car/Mr_Blue/direct_racing_Tilden_27Nov16_10h20m51s_Mr_Blue.hdf5", "../dataset/car/Mr_Blue/direct_racing_Tilden_27Nov16_10h41m05s_Mr_Blue.hdf5", "../dataset/car/Mr_Blue/direct_racing_Tilden_27Nov16_10h41m05s_Mr_Blue.hdf5"]
+        self.batch_size = 100
         self.n_test_samples  = 100
         self.n_valid_samples = 100
         self.n_train_samples = 100

@@ -7,7 +7,7 @@ import torchvision.transforms as transforms
 from utils import topologyOrder, nameToActFun
 import torch.optim as optim
 import copy
-from visualize import *
+#from visualize import *
 import collections
 import argparse
 import json
@@ -218,38 +218,46 @@ if __name__ == "__main__":
         correct = 0
         total = 0
         for inputs, labels in validloader:
-            outputs = net(Variable(inputs))
+            if torch.cuda.is_available():
+                inputs = Variable(inputs.cuda())
+            else:
+                inputs = Variable(inputs)
+            
+            outputs = net(inputs)
             if isinstance(outputs, list):
                 predicted = np.ones(outputs[0].size()[0])
                 for out, lab in zip(outputs, labels):
                     _, pred = torch.max(out.data, 1)
-                    predicted *= (pred == lab).numpy()
+                    predicted *= (pred.cpu() == lab).numpy()
                     total     += lab.size(0)
                     correct   += predicted.sum()
             else:
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
-                correct += (predicted == labels).sum()
+                correct += (predicted.cpu() == labels).sum()
         accValid = 100. * float(correct)/float(total)            
 
         
         correct = 0
         total = 0
         for inputs, labels in testloader:
-            outputs = net(Variable(inputs))
+            if torch.cuda.is_available():
+                inputs = Variable(inputs.cuda())
+            else:
+                inputs = Variable(inputs)    
+            outputs = net(inputs)
             if isinstance(outputs, list):
                 predicted = np.ones(outputs[0].size()[0])
                 for out, lab in zip(outputs, labels):
                     _, pred = torch.max(out.data, 1)
-                    predicted *= (pred == lab).numpy()
+                    predicted *= (pred.cpu() == lab).numpy()
                     total   += lab.size(0)
-                    correct += (pred == lab).sum()
+                    correct += predicted.sum()
             else:
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
-                correct += (predicted == labels).sum()
+                correct += (predicted.cpu() == labels).sum()
         accTest = 100. * float(correct)/float(total)
-
         print('Epoch:%d, Valid(Acc) %.4f%%, Test(Acc) %.4f%%' %(epoch, accValid, accTest))
 
         
