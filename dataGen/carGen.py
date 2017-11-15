@@ -22,9 +22,9 @@ class dataGenerator(dataGeneratorPrototip):
         dtm.createDataset(n_samples = self.n_valid_samples, name="valid", datasetType=datasetCar)
         dtm.createDataset(n_samples = self.n_train_samples, name="train", datasetType=datasetCar)
 
-        self.testCar  = DataLoader(dtm.dts['test'], batch_size=self.batch_size, shuffle=False, num_workers=1)
-        self.validCar = DataLoader(dtm.dts['valid'], batch_size=self.batch_size, shuffle=False, num_workers=1)
-        self.trainCar = DataLoader(dtm.dts['train'], batch_size=self.batch_size, shuffle=False, num_workers=1)
+        self.testCar  = DataLoader(dtm.dts['test'], batch_size=self.batch_size, shuffle=False, num_workers=4)
+        self.validCar = DataLoader(dtm.dts['valid'], batch_size=self.batch_size, shuffle=False, num_workers=4)
+        self.trainCar = DataLoader(dtm.dts['train'], batch_size=self.batch_size, shuffle=False, num_workers=4)
         
     
     def returnGen(self,sets,**kwargs):
@@ -204,5 +204,5 @@ class datasetCar(dataset):
         trg_s = np.argmax(np.isclose(self.range_steer, trg_s, atol=self.toll) >.5)
 
         trg = [trg_m, trg_s]
-        
+            
         return inp, trg

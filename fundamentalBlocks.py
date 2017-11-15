@@ -163,6 +163,9 @@ if __name__ == "__main__":
 
     net = Net(lstSubNets=configNet, netStrc=strctNet, fileName=results['name'])
 
+    if torch.cuda.is_available():
+        net.cuda()
+    
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9)
     optimizer.zero_grad()
@@ -180,12 +183,20 @@ if __name__ == "__main__":
         running_loss = 0.0
         cnt_b        = 0
         for inputs, labels in trainloader:
-            cnt_b += 1
-            inputs =  Variable(inputs)
-            if isinstance(labels, list):
-                labels = [Variable(lab) for lab in labels]
+            if torch.cuda.is_available():
+                inputs = Variable(inputs.cuda())
+                if isinstance(labels, list):
+                    labels = [Variable(lab.cuda()) for lab in labels]
+                else:
+                    labels = Variable(labels.cuda())
             else:
-                labels = Variable(labels)
+                inputs = Variable(inputs)
+                if isinstance(labels, list):
+                    labels = [Variable(lab) for lab in labels]
+                else:
+                    labels = Variable(labels)
+                    
+            cnt_b += 1
             
             optimizer.zero_grad()
             outputs = net(inputs)
@@ -201,7 +212,7 @@ if __name__ == "__main__":
             optimizer.step()
             running_loss += loss.data[0]
         running_loss /= float(cnt_b) 
-        print('epoch %d,  loss: %.4f' % (epoch + 1, running_loss))    
+        print('Epoch %d,  loss: %.4f' % (epoch, running_loss))    
         
     
         correct = 0
