@@ -11,17 +11,27 @@ from dataGenerator import *
 class dataGenerator(dataGeneratorPrototip):
 
     def __init__(self, **kwargs):
-        self.datafiles  = ["../dataset/car/Mr_Blue/caffe_direct_local_sidewalks_05Dec16_15h03m35s_Mr_Blue.hdf5", "../dataset/car/Mr_Blue/direct_local_17Dec16_16h29m16s_Mr_Blue.hdf5", "../dataset/car/Mr_Blue/direct_home_06Dec16_16h01m42s_Mr_Blue.hdf5", "../dataset/car/Mr_Blue/direct_31Aug2016_Mr_Blue_sidewalks_2.hdf5", "../dataset/car/Mr_Blue/direct_31Aug2016_Mr_Blue_sidewalks_1.hdf5", "../dataset/car/Mr_Blue/direct_home_06Dec16_08h10m47s_Mr_Blue.hdf5", "../dataset/car/Mr_Blue/direct_racing_Tilden_27Nov16_11h08m39s_Mr_Blue.hdf5", "../dataset/car/Mr_Blue/direct_racing_Tilden_27Nov16_12h20m21s_Mr_Blue.hdf5", "../dataset/car/Mr_Blue/direct_racing_Tilden_27Nov16_13h28m00s_Mr_Blue.hdf5", "../dataset/car/Mr_Blue/direct_racing_Tilden_27Nov16_10h20m51s_Mr_Blue.hdf5", "../dataset/car/Mr_Blue/direct_racing_Tilden_27Nov16_10h41m05s_Mr_Blue.hdf5", "../dataset/car/Mr_Blue/direct_racing_Tilden_27Nov16_10h41m05s_Mr_Blue.hdf5"]
+
+        dtFold = '/home/guglielmo/dataset/car/Mr_Blue/'
+        
+        self.datafiles  = ["caffe_direct_local_sidewalks_05Dec16_15h03m35s_Mr_Blue.hdf5", "direct_local_17Dec16_16h29m16s_Mr_Blue.hdf5", "direct_home_06Dec16_16h01m42s_Mr_Blue.hdf5", "direct_31Aug2016_Mr_Blue_sidewalks_2.hdf5", "direct_31Aug2016_Mr_Blue_sidewalks_1.hdf5", "direct_home_06Dec16_08h10m47s_Mr_Blue.hdf5", "direct_racing_Tilden_27Nov16_11h08m39s_Mr_Blue.hdf5", "direct_racing_Tilden_27Nov16_12h20m21s_Mr_Blue.hdf5", "direct_racing_Tilden_27Nov16_13h28m00s_Mr_Blue.hdf5", "direct_racing_Tilden_27Nov16_10h20m51s_Mr_Blue.hdf5", "direct_racing_Tilden_27Nov16_10h41m05s_Mr_Blue.hdf5"]
+
+        self.datafiles  = [dtFold + dt for dt in self.datafiles]
+
         self.batch_size = 100
         self.n_test_samples  = 30000
         self.n_valid_samples = 30000
         self.n_train_samples = 200000
         
         dtm  = datasetManagerCar(self.datafiles)
+        print "Number of total data present in the file:", dtm.n_data
         dtm.createDataset(n_samples = self.n_test_samples, name="test", datasetType=datasetCar)
         dtm.createDataset(n_samples = self.n_valid_samples, name="valid", datasetType=datasetCar)
         dtm.createDataset(n_samples = self.n_train_samples, name="train", datasetType=datasetCar)
+        print "Data in the test set", len(dtm.dts['test'])
+        print "Data in the test set", len(dtm.dts['train'])
 
+        
         self.testCar  = DataLoader(dtm.dts['test'], batch_size=self.batch_size, shuffle=False, num_workers=4)
         self.validCar = DataLoader(dtm.dts['valid'], batch_size=self.batch_size, shuffle=False, num_workers=4)
         self.trainCar = DataLoader(dtm.dts['train'], batch_size=self.batch_size, shuffle=False, num_workers=4)
@@ -157,7 +167,9 @@ class datasetManagerCar(datasetManager):
                 
                 for cnt_n in range(n_data):
                     label = [cnt_f, cnt_s, cnt_n]
-                    addLst.append(label) 
+                    addLst.append(label)
+                cnt_s += 1
+            cnt_f += 1            
         return addLst
         
                 
@@ -206,3 +218,4 @@ class datasetCar(dataset):
         trg = [trg_m, trg_s]
             
         return inp, trg
+
