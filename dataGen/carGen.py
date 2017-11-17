@@ -21,16 +21,13 @@ class dataGenerator(dataGeneratorPrototip):
         self.batch_size = 100
         self.n_test_samples  = 30000
         self.n_valid_samples = 30000
-        self.n_train_samples = 200000
+        self.n_train_samples = 285000
         
         dtm  = datasetManagerCar(self.datafiles)
         print "Number of total data present in the file:", dtm.n_data
         dtm.createDataset(n_samples = self.n_test_samples, name="test", datasetType=datasetCar)
         dtm.createDataset(n_samples = self.n_valid_samples, name="valid", datasetType=datasetCar)
         dtm.createDataset(n_samples = self.n_train_samples, name="train", datasetType=datasetCar)
-        print "Data in the test set", len(dtm.dts['test'])
-        print "Data in the test set", len(dtm.dts['train'])
-
         
         self.testCar  = DataLoader(dtm.dts['test'], batch_size=self.batch_size, shuffle=False, num_workers=4)
         self.validCar = DataLoader(dtm.dts['valid'], batch_size=self.batch_size, shuffle=False, num_workers=4)
