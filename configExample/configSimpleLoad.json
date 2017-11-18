@@ -3,11 +3,13 @@
     {
 	"net1":
 	{
-	    "init": "random",
+	    "init": "load",
+	    "file_name":"/home/guglielmo/torchclassifier/172130",
+	    "moduleName": "net1",
 	    "type": "conv",
 	    "params":{"in_channels":1, "out_channels": 6, "kernel_size": [3,3], "stride": 1},
 	    "actFun":"rlu",
-	    "requires_grad": true
+	    "requires_grad": false
 	},
 	"net2":
 	{
@@ -16,26 +18,32 @@
 	},
 	"net3":
 	{
-	    "init": "random",
+	    "init": "load",
+	    "file_name":"/home/guglielmo/torchclassifier/172130",
+	    "moduleName": "net3",
 	    "type": "conv",
 	    "params":{"in_channels":6, "out_channels": 16, "kernel_size": [4,4], "stride": 1},
 	    "actFun":"rlu",
-	    "requires_grad": true
+	    "requires_grad": false
 	},
 	"net4":
 	{
-	    "init": "random",
-	    "type": "conv",
+	    "init": "load",
+	    "file_name":"/home/guglielmo/torchclassifier/172130",
+	    "moduleName": "net4",
+	    "type":"conv",
 	    "params":{"in_channels":16, "out_channels": 16, "kernel_size": [4,4], "stride": 1},
 	    "actFun":"rlu",
-	    "requires_grad": true
+	    "requires_grad": false
 	},
 	"output":
 	{
-	    "init": "random",
+	    "init": "load",
+	    "file_name":"/home/guglielmo/torchclassifier/172130",
+	    "moduleName": "output",
 	    "type": "fc",
 	    "params":{"in_features":784, "out_features": 10},
-	    "requires_grad": true
+	    "requires_grad": false
 	}
     },
     "strctNet":

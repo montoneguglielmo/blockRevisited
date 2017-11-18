@@ -17,7 +17,7 @@ class dataGenerator(dataGeneratorPrototip):
 
         self.n_test_samples  = 10000
         self.n_valid_samples = 10000
-        self.n_train_samples = 10000
+        self.n_train_samples = 50000
         
         images_test  = images[:self.n_test_samples]
         images_valid = images[self.n_test_samples:self.n_test_samples+self.n_valid_samples]

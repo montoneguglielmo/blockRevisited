@@ -30,7 +30,6 @@ class Net(nn.Module):
         self.netNames   = self.lstSubNets.keys()
         self.netNames.sort()
 
-        
         self.subNets = {}
         self.actFuns = {}
         for netName in self.netNames:
@@ -41,26 +40,26 @@ class Net(nn.Module):
             if netConf['type'] == 'fc':
                 self._modules[netName]      = nn.Linear(**netConf['params'])
                 self._modules[netName].type = 'fc'
-            if netConf['type'] == 'max_pool':
-                self._modules[netName] = nn.MaxPool2d(**netConf['params'])
+            if netConf['type'] == 'max_pool':                
+                self._modules[netName]      = nn.MaxPool2d(**netConf['params'])
                 self._modules[netName].type = 'max_pool'
                 
             if 'init' in netConf and netConf['init'] == 'load':
-                mod        = torch.load(netConf['file_name'] + '.pt')
-                moduleName = netConf['moduleName']
-                state_dict={'weight': mod[moduleName + '.weight'], 'bias': mod[moduleName + '.bias']}
-                self._modules[netName].load_state_dict(state_dict)
+               mod        = torch.load(netConf['file_name'] + '.pt')
+               moduleName = netConf['moduleName']
+               state_dict = {'weight': mod[moduleName + '.weight'], 'bias': mod[moduleName + '.bias']}
+               self._modules[netName].load_state_dict(state_dict)
 
             if 'requires_grad' in netConf and not netConf['requires_grad']:
-                self._modules[netName].weight.requires_grad = False
-                self._modules[netName].bias.requires_grad   = False
+                for p in self._modules[netName].parameters():
+                    p.requires_grad = False
                 
             if 'actFun' in netConf:
-                self.actFuns[netName] = nameToActFun[netConf['actFun']]
+               self.actFuns[netName] = nameToActFun[netConf['actFun']]
             else:
-                self.actFuns[netName] = None
-        
-        
+               self.actFuns[netName] = None
+
+            
     def forward(self, x, **kwargs):
 
         self.topOrd = topologyOrder(copy.deepcopy(self.netStrc))        
@@ -181,7 +180,8 @@ if __name__ == "__main__":
         net.cuda()
     
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+    params    = filter(lambda p: p.requires_grad, net.parameters())
+    optimizer = optim.SGD(params, lr=0.001, momentum=0.9)
     optimizer.zero_grad()
 
     n_epochs      = 100
@@ -190,7 +190,7 @@ if __name__ == "__main__":
     results['ecp_tolerance']= ecp_tolerance    
     lastEpcBestAcc = 0
     oldAcc      = -np.inf
-    epoch       = 0
+    epoch       = -1
     while epoch < n_epochs:  # loop over the dataset multiple times
         epoch += 1
         
@@ -210,7 +210,7 @@ if __name__ == "__main__":
                 else:
                     labels = Variable(labels)
                     
-            cnt_b += 1
+            
             
             optimizer.zero_grad()
             outputs = net(inputs)
@@ -225,6 +225,7 @@ if __name__ == "__main__":
             loss.backward()
             optimizer.step()
             running_loss += loss.data[0]
+            cnt_b += 1
         running_loss /= float(cnt_b) 
         print('Epoch %d,  loss: %.4f' % (epoch, running_loss))    
         
