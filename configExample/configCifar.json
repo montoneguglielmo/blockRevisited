@@ -1,0 +1,64 @@
+{
+    "configNet":
+    {
+	"net1":
+	{
+	    "init": "random",
+	    "type": "conv",
+	    "params":{"in_channels":3, "out_channels": 6, "kernel_size": [5,5], "stride": 1},
+	    "actFun":"rlu",
+	    "requires_grad": true
+	},
+	"net2":
+	{
+	    "type": "max_pool",
+	    "params":{"kernel_size":2}
+	},
+	"net3":
+	{
+	    "init": "random",
+	    "type": "conv",
+	    "params":{"in_channels":6, "out_channels": 16, "kernel_size": [5,5], "stride": 1},
+	    "actFun":"rlu",
+	    "requires_grad": true
+	},
+	"net4":
+	{
+	    "type": "max_pool",
+	    "params":{"kernel_size":2}
+	},
+	"net5":
+	{
+	    "init": "random",
+	    "type": "fc",
+	    "params":{"in_features":400, "out_features": 120},
+	    "actFun":"rlu",
+	    "requires_grad": true
+	},
+	"net6":
+	{
+	    "init": "random",
+	    "type": "fc",
+	    "params":{"in_features":120, "out_features": 84},
+	    "actFun":"rlu",
+	    "requires_grad": true
+	},
+	"output":
+	{
+	    "init": "random",
+	    "type": "fc",
+	    "params":{"in_features":84, "out_features": 10},
+	    "requires_grad": true
+	}
+    },
+    "strctNet":
+    {
+	"net1"  :{"input":["input"], "output":["net2"]},
+	"net2"  :{"input":["net1"], "output":["net3"]},
+	"net3"  :{"input":["net2"], "output":["net4"]},
+	"net4"  :{"input":["net3"], "output":["net5"]},
+	"net5"  :{"input":["net4"], "output":["net6"]},
+	"net6"  :{"input":["net5"], "output":["output"]},
+	"output":{"input":["net6"]}
+    }
+}
