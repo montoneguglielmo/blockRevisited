@@ -14,6 +14,9 @@ import json
 import os
 import time
 import numpy as np
+import atexit
+import gc
+import h5py
 
 class Net(nn.Module):
 
@@ -125,11 +128,22 @@ class Net(nn.Module):
     def returnNetStrct(self, **kwargs):
         return self.netStrc
 
-    
-    
+
+def exit_handler():
+    print 'Closing hdf5 files...'
+    for obj in gc.get_objects():
+        if isinstance(obj, h5py.File):   # Just HDF5 files
+            try:
+                obj.close()
+            except:
+                pass # Was
+    print 'done'
+
+ 
 
 if __name__ == "__main__":
-    
+
+    atexit.register(exit_handler)
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", help="json file describing each layer in the network and the structure of the network")
     parser.add_argument("--dataGenerator", help="dataGenerator, one of the .py file in the folder dataGen")
@@ -229,8 +243,8 @@ if __name__ == "__main__":
                 for out, lab in zip(outputs, labels):
                     _, pred = torch.max(out.data, 1)
                     predicted *= (pred.cpu() == lab).numpy()
-                    total     += lab.size(0)
-                    correct   += predicted.sum()
+                total     += outputs[0].size(0)
+                correct   += predicted.sum()
             else:
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
@@ -251,8 +265,8 @@ if __name__ == "__main__":
                 for out, lab in zip(outputs, labels):
                     _, pred = torch.max(out.data, 1)
                     predicted *= (pred.cpu() == lab).numpy()
-                    total   += lab.size(0)
-                    correct += predicted.sum()
+                total   += output[0].size(0)
+                correct += predicted.sum()
             else:
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
