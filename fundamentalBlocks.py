@@ -181,7 +181,7 @@ if __name__ == "__main__":
         net.cuda()
     
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9)
+    optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
     optimizer.zero_grad()
 
     n_epochs      = 100
@@ -265,7 +265,7 @@ if __name__ == "__main__":
                 for out, lab in zip(outputs, labels):
                     _, pred = torch.max(out.data, 1)
                     predicted *= (pred.cpu() == lab).numpy()
-                total   += output[0].size(0)
+                total   += outputs[0].size(0)
                 correct += predicted.sum()
             else:
                 _, predicted = torch.max(outputs.data, 1)
