@@ -138,7 +138,21 @@ def exit_handler():
                 pass # Was
     print 'done'
 
- 
+
+def buildVariable(inputs):
+    if torch.cuda.is_available():
+        if isinstance(inputs, list):
+            inputs = [Variable(input.cuda()) for input in inputs]
+        else:
+            inputs = Variable(inputs.cuda())
+    else:
+        if isinstance(inputs, list):
+            inputs = [Variable(input) for input in inputs]
+        else:
+            inputs = Variable(inputs)
+
+    return inputs
+    
 
 if __name__ == "__main__":
 
@@ -197,20 +211,8 @@ if __name__ == "__main__":
         running_loss = 0.0
         cnt_b        = 0
         for inputs, labels in trainloader:
-            if torch.cuda.is_available():
-                inputs = Variable(inputs.cuda())
-                if isinstance(labels, list):
-                    labels = [Variable(lab.cuda()) for lab in labels]
-                else:
-                    labels = Variable(labels.cuda())
-            else:
-                inputs = Variable(inputs)
-                if isinstance(labels, list):
-                    labels = [Variable(lab) for lab in labels]
-                else:
-                    labels = Variable(labels)
-                    
-            
+            inputs = buildVariable(inputs)
+            labels = buildVariable(labels)
             
             optimizer.zero_grad()
             outputs = net(inputs)
@@ -233,45 +235,43 @@ if __name__ == "__main__":
         correct = 0
         total = 0
         for inputs, labels in validloader:
-            if torch.cuda.is_available():
-                inputs = Variable(inputs.cuda())
-            else:
-                inputs = Variable(inputs)
+            #print inputs
+            inputs = buildVariable(inputs)
+            labels = buildVariable(labels)
             
             outputs = net(inputs)
             if isinstance(outputs, list):
-                predicted = np.ones(outputs[0].size()[0])
+                predicted = torch.ones(1, outputs[0].size()[0])
                 for out, lab in zip(outputs, labels):
                     _, pred = torch.max(out.data, 1)
-                    predicted *= (pred.cpu() == lab).numpy()
+                    predicted *= (pred == lab.data).float()
                 total     += outputs[0].size(0)
-                correct   += predicted.sum()
+                correct   += torch.sum(predicted)
             else:
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
-                correct += (predicted.cpu() == labels).sum()
+                correct += torch.sum(predicted  == labels.data)
         accValid = 100. * float(correct)/float(total)            
 
         
         correct = 0
         total = 0
         for inputs, labels in testloader:
-            if torch.cuda.is_available():
-                inputs = Variable(inputs.cuda())
-            else:
-                inputs = Variable(inputs)    
+            inputs = buildVariable(inputs)
+            labels = buildVariable(labels)
+
             outputs = net(inputs)
             if isinstance(outputs, list):
-                predicted = np.ones(outputs[0].size()[0])
+                predicted = torch.ones(1, outputs[0].size()[0])            
                 for out, lab in zip(outputs, labels):
                     _, pred = torch.max(out.data, 1)
-                    predicted *= (pred.cpu() == lab).numpy()
+                    predicted *= (pred == lab.data).float()
                 total   += outputs[0].size(0)
-                correct += predicted.sum()
+                correct += torch.sum(predicted)
             else:
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
-                correct += (predicted.cpu() == labels).sum()
+                correct += torch.sum(predicted == labels)
         accTest = 100. * float(correct)/float(total)
         print('Epoch:%d, Valid(Acc) %.4f%%, Test(Acc) %.4f%%' %(epoch, accValid, accTest))
 
