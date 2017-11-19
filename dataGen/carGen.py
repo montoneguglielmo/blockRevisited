@@ -22,11 +22,11 @@ class dataGenerator(dataGeneratorPrototip):
 
         self.datafiles  = [dtFold + dt for dt in self.datafiles]
 
-        self.batch_size = 10
+        self.batch_size = 20
 
-        self.n_test_samples  = 200#30000
-        self.n_valid_samples = 200#30000
-        self.n_train_samples = 200#85000
+        self.n_test_samples  = 1000#30000
+        self.n_valid_samples = 1000#30000
+        self.n_train_samples = 7000
         
         dtm  = datasetManagerCar(self.datafiles)
         print "Number of total data present in the file:", dtm.n_data

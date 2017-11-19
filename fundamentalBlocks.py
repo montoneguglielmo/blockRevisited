@@ -195,13 +195,13 @@ if __name__ == "__main__":
     
     criterion = nn.CrossEntropyLoss()
     params    = filter(lambda p: p.requires_grad, net.parameters())
-    optimizer = optim.SGD(params, lr=0.01, momentum=0.9)
+    optimizer = optim.SGD(params, lr=0.0001, momentum=0.9)
     optimizer.zero_grad()
 
     n_epochs      = 100
-    ecp_tolerance = 10
+    epc_tolerance = 10
     results['n_epochs']     = n_epochs
-    results['ecp_tolerance']= ecp_tolerance    
+    results['epc_tolerance']= epc_tolerance    
     lastEpcBestAcc = 0
     oldAcc      = -np.inf
     epoch       = -1
@@ -221,7 +221,10 @@ if __name__ == "__main__":
             
             if isinstance(outputs, list):
                 loss  = 0
-                predicted = torch.ones(1, outputs[0].size()[0])
+                if torch.cuda.is_available():
+                    predicted = torch.ones(1, outputs[0].size()[0]).cuda()
+                else:
+                    predicted = torch.ones(1, outputs[0].size()[0])                    
                 for out, lab in zip(outputs, labels):
                     loss += criterion(out, lab)
                     _, pred = torch.max(out.data, 1)
@@ -250,13 +253,21 @@ if __name__ == "__main__":
             
             outputs = net(inputs)
             if isinstance(outputs, list):
-                predicted = torch.ones(1, outputs[0].size()[0])
+                if torch.cuda.is_available():
+                    predicted = torch.ones(1, outputs[0].size()[0]).cuda()
+                else:
+                    predicted = torch.ones(1, outputs[0].size()[0])
+
                 for out, lab in zip(outputs, labels):
+                    if torch.cuda.is_available():
+                        lab = lab.cuda()
                     _, pred = torch.max(out.data, 1)
                     predicted *= (pred == lab).float()
                 total     += outputs[0].size(0)
                 correct   += torch.sum(predicted)
             else:
+                if torch.cuda.is_available():
+                    labels = labels.cuda()
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted  == labels).sum()
@@ -270,13 +281,21 @@ if __name__ == "__main__":
 
             outputs = net(inputs)
             if isinstance(outputs, list):
-                predicted = torch.ones(1, outputs[0].size()[0])            
+                if torch.cuda.is_available():
+                    predicted = torch.ones(1, outputs[0].size()[0]).cuda()
+                else:
+                    predicted = torch.ones(1, outputs[0].size()[0])
+                
                 for out, lab in zip(outputs, labels):
+                    if torch.cuda.is_available():
+                        lab = lab.cuda()
                     _, pred = torch.max(out.data, 1)
                     predicted *= (pred == lab).float()
                 total   += outputs[0].size(0)
                 correct += torch.sum(predicted)
             else:
+                if torch.cuda.is_available():
+                    labels = labels.cuda()
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum()
