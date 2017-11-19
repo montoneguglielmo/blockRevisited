@@ -18,7 +18,7 @@
 	{
 	    "init": "random",
 	    "type": "conv",
-	    "params":{"in_channels":3, "out_channels": 3, "kernel_size": [1,1], "stride": 1},
+	    "params":{"in_channels":3, "out_channels": 3, "kernel_size": [3,3], "stride": 1},
 	    "actFun":"rlu",
 	    "requires_grad": true
 	},
@@ -34,7 +34,7 @@
 	{
 	    "init": "random",
 	    "type": "conv",
-	    "params":{"in_channels":3, "out_channels": 3, "kernel_size": [1,1], "stride": 1},
+	    "params":{"in_channels":3, "out_channels": 3, "kernel_size": [3,3], "stride": 1},
 	    "actFun":"rlu",
 	    "requires_grad": true
 	},
@@ -50,7 +50,7 @@
 	{
 	    "init": "random",
 	    "type": "conv",
-	    "params":{"in_channels":3, "out_channels": 3, "kernel_size": [1,1], "stride": 1},
+	    "params":{"in_channels":3, "out_channels": 3, "kernel_size": [3,3], "stride": 1},
 	    "actFun":"rlu",
 	    "requires_grad": true
 	},
@@ -65,22 +65,20 @@
         "net9":
 	{
             "type": "max_pool",
-	    "params":{"kernel_size":7}
+	    "params":{"kernel_size":3}
 	},        
 	"output0":
 	{
 	    "init": "random",
 	    "type": "fc",
-	    "params":{"in_features":54, "out_features": 5},
-	    "actFun":"softmax",
+	    "params":{"in_features":210, "out_features": 5},
 	    "requires_grad": true
 	},
         "output1":
 	{
 	    "init": "random",
 	    "type": "fc",
-	    "params":{"in_features":54, "out_features": 5},
-	    "actFun":"softmax",
+	    "params":{"in_features":210, "out_features": 5},
 	    "requires_grad": true
 	}
     },

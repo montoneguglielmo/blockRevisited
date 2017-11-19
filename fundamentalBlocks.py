@@ -195,7 +195,7 @@ if __name__ == "__main__":
     
     criterion = nn.CrossEntropyLoss()
     params    = filter(lambda p: p.requires_grad, net.parameters())
-    optimizer = optim.SGD(params, lr=0.001, momentum=0.9)
+    optimizer = optim.SGD(params, lr=0.01, momentum=0.9)
     optimizer.zero_grad()
 
     n_epochs      = 100
@@ -210,6 +210,8 @@ if __name__ == "__main__":
         
         running_loss = 0.0
         cnt_b        = 0
+        total        = 0
+        correct      = 0
         for inputs, labels in trainloader:
             inputs = buildVariable(inputs)
             labels = buildVariable(labels)
@@ -217,40 +219,47 @@ if __name__ == "__main__":
             optimizer.zero_grad()
             outputs = net(inputs)
             
-            loss = 0
             if isinstance(outputs, list):
+                loss  = 0
+                predicted = torch.ones(1, outputs[0].size()[0])
                 for out, lab in zip(outputs, labels):
                     loss += criterion(out, lab)
+                    _, pred = torch.max(out.data, 1)
+                    predicted *= (pred == lab.data).float()
+                total     += outputs[0].size(0)
+                correct   += torch.sum(predicted)
             else:
-                loss = criterion(outputs, labels)
+                loss         = criterion(outputs, labels)
+                _, predicted = torch.max(outputs.data, 1)
+                total       += labels.size(0)
+                correct     += (predicted  == labels.data).sum()
 
             loss.backward()
             optimizer.step()
             running_loss += loss.data[0]
             cnt_b += 1
-        running_loss /= float(cnt_b) 
+        running_loss /= float(cnt_b)
+        accTrain = 100. * float(correct)/float(total)
         print('Epoch %d,  loss: %.4f' % (epoch, running_loss))    
         
     
         correct = 0
-        total = 0
+        total   = 0
         for inputs, labels in validloader:
-            #print inputs
             inputs = buildVariable(inputs)
-            labels = buildVariable(labels)
             
             outputs = net(inputs)
             if isinstance(outputs, list):
                 predicted = torch.ones(1, outputs[0].size()[0])
                 for out, lab in zip(outputs, labels):
                     _, pred = torch.max(out.data, 1)
-                    predicted *= (pred == lab.data).float()
+                    predicted *= (pred == lab).float()
                 total     += outputs[0].size(0)
                 correct   += torch.sum(predicted)
             else:
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
-                correct += torch.sum(predicted  == labels.data)
+                correct += (predicted  == labels).sum()
         accValid = 100. * float(correct)/float(total)            
 
         
@@ -258,22 +267,21 @@ if __name__ == "__main__":
         total = 0
         for inputs, labels in testloader:
             inputs = buildVariable(inputs)
-            labels = buildVariable(labels)
 
             outputs = net(inputs)
             if isinstance(outputs, list):
                 predicted = torch.ones(1, outputs[0].size()[0])            
                 for out, lab in zip(outputs, labels):
                     _, pred = torch.max(out.data, 1)
-                    predicted *= (pred == lab.data).float()
+                    predicted *= (pred == lab).float()
                 total   += outputs[0].size(0)
                 correct += torch.sum(predicted)
             else:
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
-                correct += torch.sum(predicted == labels)
+                correct += (predicted == labels).sum()
         accTest = 100. * float(correct)/float(total)
-        print('Epoch:%d, Valid(Acc) %.4f%%, Test(Acc) %.4f%%' %(epoch, accValid, accTest))
+        print('Epoch:%d, Train(Acc) %.3f%%, Valid(Acc) %.3f%%, Test(Acc) %.3f%%' %(epoch, accTrain, accValid, accTest))
 
         
         if accValid < oldAcc and (epoch-lastEpcBestAcc)>epc_tolerance:

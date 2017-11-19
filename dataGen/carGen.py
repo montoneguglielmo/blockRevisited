@@ -4,6 +4,7 @@ import time
 import re
 import sys
 import warnings
+import torch
 from torch.utils.data import DataLoader, Dataset
 from dataGenerator import *
 
@@ -21,10 +22,11 @@ class dataGenerator(dataGeneratorPrototip):
 
         self.datafiles  = [dtFold + dt for dt in self.datafiles]
 
-        self.batch_size = 100
-        self.n_test_samples  = 1000#30000
-        self.n_valid_samples = 1000#30000
-        self.n_train_samples = 7000#85000
+        self.batch_size = 10
+
+        self.n_test_samples  = 200#30000
+        self.n_valid_samples = 200#30000
+        self.n_train_samples = 200#85000
         
         dtm  = datasetManagerCar(self.datafiles)
         print "Number of total data present in the file:", dtm.n_data
@@ -34,7 +36,7 @@ class dataGenerator(dataGeneratorPrototip):
         
         self.testCar  = DataLoader(dtm.dts['test'], batch_size=self.batch_size, shuffle=False, num_workers=1)
         self.validCar = DataLoader(dtm.dts['valid'], batch_size=self.batch_size, shuffle=False, num_workers=1)
-        self.trainCar = DataLoader(dtm.dts['train'], batch_size=self.batch_size, shuffle=False, num_workers=1)
+        self.trainCar = DataLoader(dtm.dts['train'], batch_size=self.batch_size, shuffle=True, num_workers=1)
         
     
     def returnGen(self,sets,**kwargs):
@@ -189,8 +191,6 @@ class datasetCar(dataset):
         
                                
     def get_data(self,label, name):
-            #print label
-            #print self.fh5_lst[label[0]], 'segments/' + str(label[1]) + '/' + name, label[2]
             data = self.fh5_lst[label[0]]['segments/' + str(label[1]) + '/' + name][label[2]]
             return np.asarray(data, dtype=np.float32)                   
 
@@ -212,7 +212,9 @@ class datasetCar(dataset):
         inp.append(self.get_data(label_prv, 'right'))
         inp = np.concatenate(inp, axis=2)/255.
         inp = np.rollaxis(inp, 2)
-        
+
+        inp = torch.from_numpy(inp)
+       
         trg_m = (self.get_data(label_, 'motor') - self.motor_min)/(self.motor_max-self.motor_min)
         trg_s = (self.get_data(label_, 'steer') - self.steer_min)/(self.steer_max-self.steer_min)
 
