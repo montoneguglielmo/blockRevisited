@@ -221,7 +221,8 @@ class datasetCar(dataset):
         trg_m = np.argmax(np.isclose(self.range_motor, trg_m, atol=self.toll) >.5)
         trg_s = np.argmax(np.isclose(self.range_steer, trg_s, atol=self.toll) >.5)
 
-        trg = [trg_m, trg_s]
-            
+        #trg = [trg_m, trg_s]
+        trg = int(trg_m + 5*trg_s)
+        
         return inp, trg
 
