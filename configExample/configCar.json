@@ -66,19 +66,26 @@
 	{
             "type": "max_pool",
 	    "params":{"kernel_size":3}
-	},        
+	},
+        "net10":
+	{
+	    "init":"random",
+	    "type":"fc",
+	    "params":{"in_features":14336, "out_features":300},
+	    "requires_grad": true
+	},
+	"net11":
+	{
+	    "init":"random",
+	    "type":"fc",
+	    "params":{"in_features":300, "out_features":300},
+	    "requires_grad":true
+	},
 	"output0":
 	{
 	    "init": "random",
 	    "type": "fc",
-	    "params":{"in_features":14336, "out_features": 5},
-	    "requires_grad": true
-	},
-        "output1":
-	{
-	    "init": "random",
-	    "type": "fc",
-	    "params":{"in_features":14336, "out_features": 5},
+	    "params":{"in_features":300, "out_features": 25},
 	    "requires_grad": true
 	}
     },
@@ -92,8 +99,9 @@
         "net6"   :{"input":["net5"], "output":["net7"]},
         "net7"   :{"input":["net6"], "output":["net8"]},
         "net8"   :{"input":["net7"], "output":["net9"]},  
-        "net9"   :{"input":["net8"], "output":["output0", "output1"]},
-	"output0":{"input":["net9"]},
-        "output1":{"input":["net9"]}
+        "net9"   :{"input":["net8"], "output":["net10"]},
+	"net10"  :{"input":["net9"], "output":["net11"]},
+	"net11"  :{"input":["net10"],"output":["output0"]},
+	"output0":{"input":["net11"]}
     }
 }

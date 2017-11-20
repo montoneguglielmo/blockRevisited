@@ -201,7 +201,7 @@ if __name__ == "__main__":
         optimizer = optim.SGD(params, lr=0.0001, momentum=0.9)
         optimizer.zero_grad()
     else:
-        lr = 0.1
+        lr = 0.0001
     
     n_epochs      = 100
     epc_tolerance = 10
@@ -257,12 +257,11 @@ if __name__ == "__main__":
         accTrain = 100. * float(correct)/float(total)
         print('Epoch %d,  loss: %.4f' % (epoch, running_loss))    
         
-    
+
         correct = 0
         total   = 0
         for inputs, labels in validloader:
             inputs = buildVariable(inputs)
-            
             outputs = net(inputs)
             if isinstance(outputs, list):
                 if torch.cuda.is_available():
@@ -284,13 +283,11 @@ if __name__ == "__main__":
                 total += labels.size(0)
                 correct += (predicted  == labels).sum()
         accValid = 100. * float(correct)/float(total)            
-
         
         correct = 0
         total = 0
         for inputs, labels in testloader:
             inputs = buildVariable(inputs)
-
             outputs = net(inputs)
             if isinstance(outputs, list):
                 if torch.cuda.is_available():

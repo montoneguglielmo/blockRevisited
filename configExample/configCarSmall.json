@@ -1,0 +1,31 @@
+{
+    "configNet":
+    {
+	"net1":
+	{
+	    "init": "random",
+	    "type": "conv",
+	    "params":{"in_channels":12, "out_channels": 5, "kernel_size": [7,7], "stride": 1},
+	    "actFun":"rlu",
+	    "requires_grad": true
+	},
+	"net2":
+	{
+	    "type": "max_pool",
+	    "params":{"kernel_size":5}
+	},        
+	"output0":
+	{
+	    "init": "random",
+	    "type": "fc",
+	    "params":{"in_features":2720, "out_features": 25},
+	    "requires_grad": true
+	}
+    },
+    "strctNet":
+    {
+	"net1"   :{"input":["input"], "output":["net2"]},
+	"net2"   :{"input":["net1"], "output":["output0"]},
+	"output0":{"input":["net2"]}
+    }
+}
