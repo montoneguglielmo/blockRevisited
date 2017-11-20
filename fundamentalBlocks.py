@@ -195,9 +195,14 @@ if __name__ == "__main__":
     
     criterion = nn.CrossEntropyLoss()
     params    = filter(lambda p: p.requires_grad, net.parameters())
-    optimizer = optim.SGD(params, lr=0.0001, momentum=0.9)
-    optimizer.zero_grad()
 
+    use_optim = False
+    if use_optim:
+        optimizer = optim.SGD(params, lr=0.0001, momentum=0.9)
+        optimizer.zero_grad()
+    else:
+        lr = 0.1
+    
     n_epochs      = 100
     epc_tolerance = 10
     results['n_epochs']     = n_epochs
@@ -216,9 +221,7 @@ if __name__ == "__main__":
             inputs = buildVariable(inputs)
             labels = buildVariable(labels)
             
-            optimizer.zero_grad()
             outputs = net(inputs)
-            
             if isinstance(outputs, list):
                 loss  = 0
                 if torch.cuda.is_available():
@@ -237,8 +240,17 @@ if __name__ == "__main__":
                 total       += labels.size(0)
                 correct     += (predicted  == labels.data).sum()
 
-            loss.backward()
-            optimizer.step()
+
+            if use_optim:
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+            else:
+                net.zero_grad()
+                loss.backward()
+                for param in params:
+                    param.data -= lr * param.grad.data
+            
             running_loss += loss.data[0]
             cnt_b += 1
         running_loss /= float(cnt_b)

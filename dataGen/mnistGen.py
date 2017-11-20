@@ -3,7 +3,7 @@ import gzip
 import cPickle as pickle
 import torch
 from torch.utils.data import Dataset, DataLoader
-
+import numpy as np
 
 class dataGenerator(dataGeneratorPrototip):
 
@@ -65,9 +65,13 @@ class mnist(Dataset):
         img    = self.inp[idx]
         trg    = self.trg[idx]
 
+        #print img.shape
+        img = np.reshape(img, (img.shape[1] * img.shape[2]))
+        
         if self.transform:
             img = self.transform(img)
 
+            
         return img, trg
 
 
