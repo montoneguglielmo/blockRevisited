@@ -103,5 +103,14 @@
 	"net10"  :{"input":["net9"], "output":["net11"]},
 	"net11"  :{"input":["net10"],"output":["output0"]},
 	"output0":{"input":["net11"]}
+    },
+    "optim":
+    {
+	"name": "Vanilla",
+	"params":
+	{
+	    "lr":0.1,
+	    "weight_decay":1e-4
+	}
     }
 }
