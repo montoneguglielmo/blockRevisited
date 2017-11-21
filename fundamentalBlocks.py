@@ -249,7 +249,7 @@ if __name__ == "__main__":
             running_loss += loss.data[0]
             cnt_b += 1
         running_loss /= float(cnt_b)
-        accTrain = 100. * float(correct)/float(total)
+        accTrain = 100. * (1. - float(correct)/float(total))
         print('Epoch %d,  loss: %.4f' % (epoch, running_loss))    
         
 
@@ -277,7 +277,7 @@ if __name__ == "__main__":
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted  == labels).sum()
-        accValid = 100. * float(correct)/float(total)            
+        accValid = 100. * (1. - float(correct)/float(total))            
         
         correct = 0
         total = 0
@@ -303,8 +303,8 @@ if __name__ == "__main__":
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum()
-        accTest = 100. * float(correct)/float(total)
-        print('Epoch:%d, Train(Acc) %.3f%%, Valid(Acc) %.3f%%, Test(Acc) %.3f%%' %(epoch, accTrain, accValid, accTest))
+        accTest = 100. * (1.- float(correct)/float(total))
+        print('Epoch:%d, Train(Miss) %.3f%%, Valid(Miss) %.3f%%, Test(Miss) %.3f%%' %(epoch, accTrain, accValid, accTest))
 
         
         if accValid < oldAcc and (epoch-lastEpcBestAcc)>epc_tolerance:
