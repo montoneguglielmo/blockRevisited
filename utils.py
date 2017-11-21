@@ -1,5 +1,29 @@
 import torch.nn.functional as F
 import torch.nn as nn
+import torch.optim
+
+##TRY IT ALSO WITH WEIGHT THAT SHOULD NOT BE UPDATED
+class vanilla(torch.optim.Optimizer):
+
+    def __init__(self, params, lr=0.1, weight_decay=0):
+        defaults = dict(lr=lr, weight_decay=weight_decay)
+        super(vanilla, self).__init__(params, defaults)
+                      
+    def step(self, closure=None):
+        loss = None
+        if closure is not None:
+            loss=closure()
+                      
+        for group in self.param_groups:
+            for p in group['params']:
+                if p.grad is None:
+                    continue
+                d_p = p.grad.data
+                if group['weight_decay'] != 0:
+                    d_p.add_(group['weight_decay'], p.data)
+                p.data.add_(-group['lr'], d_p)
+                
+        return loss
 
 
 class bidict(dict):
@@ -21,8 +45,8 @@ class bidict(dict):
             del self.inverse[self[key]]
         super(bidict, self).__delitem__(key)
 
-nameToActFun = bidict({'rlu': F.relu, 'softmax':nn.Softmax()})
-        
+nameToActFun = bidict({'rlu': F.relu, 'softmax':nn.Softmax})
+nameToOptim  = bidict({'Vanilla': vanilla, 'SGD': torch.optim.SGD})
 
 def topologyOrder(netStr):
 
@@ -56,6 +80,8 @@ def topologyOrder(netStr):
 
 
 
+                      
+                      
 if __name__ == "__main__":
 
     netStr = {

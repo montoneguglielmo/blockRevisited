@@ -43,7 +43,7 @@
 	    "moduleName": "output",
 	    "type": "fc",
 	    "params":{"in_features":784, "out_features": 10},
-	    "requires_grad": false
+	    "requires_grad": true
 	}
     },
     "strctNet":
@@ -53,5 +53,13 @@
 	"net3"  :{"input":["net2"], "output":["net4"]},
 	"net4"  :{"input":["net3"], "output":["output"]},
 	"output":{"input":["net4"]}
+    },
+    "optim":
+    {
+	"name": "Vanilla",
+	"params":
+	{
+	    "lr":0.1
+	}
     }
 }

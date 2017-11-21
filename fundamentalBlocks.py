@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision
 import torchvision.transforms as transforms
-from utils import topologyOrder, nameToActFun
+from utils import topologyOrder, nameToActFun, nameToOptim, vanilla
 import torch.optim as optim
 import copy
 #from visualize import *
@@ -196,13 +196,14 @@ if __name__ == "__main__":
     criterion = nn.CrossEntropyLoss()
     params    = filter(lambda p: p.requires_grad, net.parameters())
 
-    use_optim = False
-    if use_optim:
-        optimizer = optim.SGD(params, lr=0.0001, momentum=0.9)
-        optimizer.zero_grad()
-    else:
-        lr = 0.0001
-    
+    if 'optim' in confJson:
+        optimName = confJson['optim']['name']
+        if 'params' in confJson['optim']:
+            paramsOpt = confJson['optim']['params']
+            optimizer   = nameToOptim[optimName](params, **paramsOpt)
+        else:
+            optimizer   = nameToOptim[optimName](params)
+            
     n_epochs      = 100
     epc_tolerance = 10
     results['n_epochs']     = n_epochs
@@ -240,16 +241,10 @@ if __name__ == "__main__":
                 total       += labels.size(0)
                 correct     += (predicted  == labels.data).sum()
 
-
-            if use_optim:
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
-            else:
-                net.zero_grad()
-                loss.backward()
-                for param in params:
-                    param.data -= lr * param.grad.data
+                
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
             
             running_loss += loss.data[0]
             cnt_b += 1
@@ -324,6 +319,12 @@ if __name__ == "__main__":
             results['configNet']  = net.returnNetCfg()
             results['strctNet']   = net.returnNetStrct()
             results['dataset']    = dataGen.returnConfig()
+            results['optimizer']  = {}
+            results['optimizer']['name']  = nameToOptim.inverse[type(optimizer)]
+            keysOpt = optimizer.state_dict()['param_groups'][0].keys()
+            paramOpt = {key:optimizer.state_dict()['param_groups'][0][key] for key in keysOpt if key is not 'params'}
+            results['optimizer']['params']= paramOpt
+
             torch.save(net.returnNetParams(), net.fileName + '.pt')
 
             with open(net.fileName + 'res.json', 'w') as f:
