@@ -109,7 +109,7 @@
 	"name": "Vanilla",
 	"params":
 	{
-	    "lr":0.1,
+	    "lr":0.001,
 	    "weight_decay":1e-4
 	}
     }

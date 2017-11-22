@@ -27,5 +27,14 @@
 	"net1"   :{"input":["input"], "output":["net2"]},
 	"net2"   :{"input":["net1"], "output":["output0"]},
 	"output0":{"input":["net2"]}
+    },
+    "optim":
+    {
+	"name": "Vanilla",
+	"params":
+	{
+	    "lr":0.001,
+	    "weight_decay":1e-4
+	}
     }
 }

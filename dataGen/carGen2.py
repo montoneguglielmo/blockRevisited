@@ -23,15 +23,17 @@ class dataGenerator(dataGeneratorPrototip):
         #self.datafiles  = ["direct_31Aug2016_Mr_Blue_sidewalks_1.hdf5", "direct_home_06Dec16_08h10m47s_Mr_Blue.hdf5"]
 
         #self.datafiles = ["caffe_direct_local_sidewalks_05Dec16_15h03m35s_Mr_Blue.hdf5"]
-        self.datafiles  = ["direct_31Aug2016_Mr_Blue_sidewalks_1.hdf5", "direct_home_06Dec16_08h10m47s_Mr_Blue.hdf5"]
+        #self.datafiles  = ["direct_31Aug2016_Mr_Blue_sidewalks_1.hdf5"]#, "direct_home_06Dec16_08h10m47s_Mr_Blue.hdf5"]
 
+        self.datafiles = ["caffe_z2_color_direct_Smyth_tape_single_transmitter_11Feb17_14h06m16s_Mr_Blue.hdf5", "caffe_z2_color_direct_Smyth_tape_single_transmitter_11Feb17_15h07m11s_Mr_Blue.hdf5"]
+        
         self.datafiles  = [dtFold + dt for dt in self.datafiles]
 
         self.batch_size = 100
 
-        self.n_test_samples  = 8000#30000
-        self.n_valid_samples = 8000#30000
-        self.n_train_samples = 30000
+        self.n_test_samples  = 2000#30000
+        self.n_valid_samples = 2000#30000
+        self.n_train_samples = 15000
         
         self.dtm  = datasetManagerCar(self.datafiles)
         print "Number of total data present in the file:", self.dtm.n_data
@@ -129,6 +131,8 @@ class dataset(Dataset):
 class datasetManagerCar(datasetManager):
 
     def __init__(self, file_list):
+        self.file_lst = file_list
+        self._createExtLinkFile()
         super(datasetManagerCar, self).__init__(file_list)
         self.fields = ['left','left_timestamp', 'right', 'motor', 'state', 'steer']
         self._addrs = self._dataAddressList()
