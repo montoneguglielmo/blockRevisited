@@ -5,7 +5,7 @@
 	{
 	    "init": "random",
 	    "type": "conv",
-	    "params":{"in_channels":12, "out_channels": 96, "kernel_size": [7,7], "stride": 1},
+	    "params":{"in_channels":12, "out_channels": 96, "kernel_size": [5,5], "stride": 1},
 	    "actFun":"rlu",
 	    "requires_grad": true
 	},
@@ -67,25 +67,11 @@
             "type": "max_pool",
 	    "params":{"kernel_size":3}
 	},
-        "net10":
+        "output":
 	{
 	    "init":"random",
 	    "type":"fc",
-	    "params":{"in_features":14336, "out_features":300},
-	    "requires_grad": true
-	},
-	"net11":
-	{
-	    "init":"random",
-	    "type":"fc",
-	    "params":{"in_features":300, "out_features":300},
-	    "requires_grad":true
-	},
-	"output0":
-	{
-	    "init": "random",
-	    "type": "fc",
-	    "params":{"in_features":300, "out_features": 25},
+	    "params":{"in_features":14336, "out_features":25},
 	    "requires_grad": true
 	}
     },
@@ -99,10 +85,8 @@
         "net6"   :{"input":["net5"], "output":["net7"]},
         "net7"   :{"input":["net6"], "output":["net8"]},
         "net8"   :{"input":["net7"], "output":["net9"]},  
-        "net9"   :{"input":["net8"], "output":["net10"]},
-	"net10"  :{"input":["net9"], "output":["net11"]},
-	"net11"  :{"input":["net10"],"output":["output0"]},
-	"output0":{"input":["net11"]}
+        "net9"   :{"input":["net8"], "output":["output"]},
+	"output" :{"input":["net9"]}
     },
     "optim":
     {
@@ -110,7 +94,7 @@
 	"params":
 	{
 	    "lr":0.001,
-	    "weight_decay":1e-4
+	    "weight_decay":1e-5
 	}
     }
 }

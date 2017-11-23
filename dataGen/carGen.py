@@ -19,14 +19,14 @@ class dataGenerator(dataGeneratorPrototip):
 
         dtFold = '/home/guglielmo/dataset/car/Mr_Blue/toKill/'
         
-        self.datafile  = "caffe_direct_local_sidewalks_05Dec16_15h03m35s_Mr_Blue_part1.hdf5"
+        self.datafile  = "direct.hdf5"
         self.datafile  = dtFold + self.datafile
 
         self.batch_size = 100
 
         self.n_test_samples  = 8000#30000
         self.n_valid_samples = 8000#30000
-        self.n_train_samples = 30000
+        self.n_train_samples = 20000
         
         self.dtm  = datasetManagerCar(self.datafile)
         print "Number of total data present in the file:", self.dtm.n_data
@@ -197,6 +197,7 @@ class datasetCar(dataset):
         consecutive = True
         if np.abs(self.get_data(label_,"left_timestamp") - self.get_data(label_prv,"left_timestamp")) > self.time_tol:
             consecutive=False
+            label_prv  = label_
             
         inp = []
         inp.append(self.get_data(label_, 'left'))
