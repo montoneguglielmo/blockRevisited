@@ -1,28 +1,26 @@
+from torch.utils.data import DataLoader
+from torch.utils.data import Dataset as DatasetTorch
+import re
 import h5py
 import numpy as np
-import time
-import re
-import sys
-import warnings
 import torch
-from torch.utils.data import DataLoader, Dataset
 from dataGenerator import *
+
+def atoi(text):
+    return int(text) if text.isdigit() else text
+
+def natural_keys(text):
+    return [ atoi(c) for c in re.split('(\d+)', text) ]
 
 
 class dataGenerator(dataGeneratorPrototip):
 
     def __init__(self, **kwargs):
 
-        dtFold = '/home/guglielmo/dataset/car/Mr_Blue/'
+        dtFold = '/home/guglielmo/dataset/car/Mr_Blue/toKill/'
         
-        #self.datafiles  = ["caffe_direct_local_sidewalks_05Dec16_15h03m35s_Mr_Blue.hdf5", "direct_local_17Dec16_16h29m16s_Mr_Blue.hdf5", "direct_home_06Dec16_16h01m42s_Mr_Blue.hdf5", "direct_31Aug2016_Mr_Blue_sidewalks_2.hdf5", "direct_31Aug2016_Mr_Blue_sidewalks_1.hdf5", "direct_home_06Dec16_08h10m47s_Mr_Blue.hdf5", "direct_racing_Tilden_27Nov16_11h08m39s_Mr_Blue.hdf5", "direct_racing_Tilden_27Nov16_12h20m21s_Mr_Blue.hdf5", "direct_racing_Tilden_27Nov16_13h28m00s_Mr_Blue.hdf5", "direct_racing_Tilden_27Nov16_10h20m51s_Mr_Blue.hdf5", "direct_racing_Tilden_27Nov16_10h41m05s_Mr_Blue.hdf5"]
-
-        #self.datafiles  = ["direct_racing_Tilden_27Nov16_10h20m51s_Mr_Blue.hdf5"]
-        self.datafiles  = ["direct_31Aug2016_Mr_Blue_sidewalks_1.hdf5", "direct_home_06Dec16_08h10m47s_Mr_Blue.hdf5"]
-
-        #self.datafiles = ["caffe_direct_local_sidewalks_05Dec16_15h03m35s_Mr_Blue.hdf5"]
-
-        self.datafiles  = [dtFold + dt for dt in self.datafiles]
+        self.datafile  = "caffe_direct_local_sidewalks_05Dec16_15h03m35s_Mr_Blue_part1.hdf5"
+        self.datafile  = dtFold + self.datafile
 
         self.batch_size = 100
 
@@ -30,15 +28,15 @@ class dataGenerator(dataGeneratorPrototip):
         self.n_valid_samples = 8000#30000
         self.n_train_samples = 30000
         
-        self.dtm  = datasetManagerCar(self.datafiles)
+        self.dtm  = datasetManagerCar(self.datafile)
         print "Number of total data present in the file:", self.dtm.n_data
-        self.dtm.createDataset(n_samples = self.n_test_samples, name="test", datasetType=datasetCar)
-        self.dtm.createDataset(n_samples = self.n_valid_samples, name="valid", datasetType=datasetCar)
-        self.dtm.createDataset(n_samples = self.n_train_samples, name="train", datasetType=datasetCar)
+        test_dts  = self.dtm.createDataset(n_samples = self.n_test_samples, name="test", datasetType=datasetCar)
+        valid_dts = self.dtm.createDataset(n_samples = self.n_valid_samples, name="valid", datasetType=datasetCar)
+        train_dts = self.dtm.createDataset(n_samples = self.n_train_samples, name="train", datasetType=datasetCar)
         
-        self.testCar  = DataLoader(self.dtm.dts['test'], batch_size=self.batch_size, shuffle=False, num_workers=1)
-        self.validCar = DataLoader(self.dtm.dts['valid'], batch_size=self.batch_size, shuffle=False, num_workers=1)
-        self.trainCar = DataLoader(self.dtm.dts['train'], batch_size=self.batch_size, shuffle=True, num_workers=1)
+        self.testCar  = DataLoader(test_dts, batch_size=self.batch_size, shuffle=False, num_workers=1)
+        self.validCar = DataLoader(valid_dts, batch_size=self.batch_size, shuffle=False, num_workers=1)
+        self.trainCar = DataLoader(train_dts, batch_size=self.batch_size, shuffle=False, num_workers=1)
         
     
     def returnGen(self,sets,**kwargs):
@@ -51,45 +49,44 @@ class dataGenerator(dataGeneratorPrototip):
 
 
     def returnConfig(self,**kwargs):
-        conf = {'datafiles': self.datafiles, 'n_test_samples': self.n_test_samples, 'n_valid_samples': self.n_valid_samples, 'n_train_samples': self.n_train_samples, 'batch_sz': self.batch_size}
+        conf = {'datafile': self.datafile, 'n_test_samples': self.n_test_samples, 'n_valid_samples': self.n_valid_samples, 'n_train_samples': self.n_train_samples, 'batch_sz': self.batch_size}
         return conf
 
 
 
 
-    
-def atoi(text):
-    return int(text) if text.isdigit() else text
-
-def natural_keys(text):
-    return [ atoi(c) for c in re.split('(\d+)', text) ]
-
-
-    
 class datasetManager(object):
 
-    def __init__(self, file_list):
+    def __init__(self, file_hdf):
 
-        self.file_lst     = file_list
-        self.dts          = {}
+        self.file_hdf     = file_hdf
+        self._openFile()
         
+        self.dts_names    = []
+        self.dts_ids      = []
         self.n_data       = self._n_data()
         self.unused_ids   = range(self.n_data)
-        
         self.preprocess()
-
         
     def createDataset(self, n_samples, **kwargs):
-
         if n_samples > len(self.unused_ids):
             warnings.warn("Then number of sample exceed the number of data left in the dataset.")
             
-        name    = kwargs['name']
-        dataset = kwargs['datasetType']
-        self.dts[name]  = dataset(n_samples, unused_ids=self.unused_ids, **kwargs)
-        to_remove       = self.dts[name].ids
+        name      =  kwargs['name']
+        dataset   =  kwargs['datasetType']
+        dts       = dataset(n_samples, unused_ids=self.unused_ids, **kwargs)
+        self.dts_names.append(kwargs['name'])
+        self.dts_ids.append(dts.ids)
+        to_remove       = dts.ids
         self.unused_ids = self._remove_ids(to_remove)
-        
+        return dts
+
+    def _openFile(self):
+        pass
+
+    def closeFile(self):
+        pass
+    
     def _remove_ids(self,to_remove):
         unused_ids = [id_ for id_ in self.unused_ids if id_ not in to_remove]
         return unused_ids
@@ -97,13 +94,11 @@ class datasetManager(object):
     def _n_data(self):
         return 0
         
-
     def preprocess(self):
         pass
-        
 
-
-class dataset(Dataset):
+    
+class dataset(DatasetTorch):
 
     def __init__(self, n_samples, **kwargs):
         self.n_samples = n_samples
@@ -125,58 +120,49 @@ class dataset(Dataset):
 
 class datasetManagerCar(datasetManager):
 
-    def __init__(self, file_list):
-        super(datasetManagerCar, self).__init__(file_list)
+    def __init__(self, file_hdf):
+        super(datasetManagerCar, self).__init__(file_hdf)
         self.fields = ['left','left_timestamp', 'right', 'motor', 'state', 'steer']
         self._addrs = self._dataAddressList()
-        
-        
-    def _openFile(self):
-        self.fh5_lst = []
-        for f in self.file_lst:
-            self.fh5_lst.append(h5py.File(f, "r"))
 
+    def _openFile(self):
+        self.fh5  = h5py.File(self.file_hdf, "r")
             
     def closeFile(self):
-        for f in self.fh5_lst:
-            f.close()
-
+        self.fh5.close()
             
     def _n_data(self):
-        self._openFile()
         n_data = 0
-        for f in self.fh5_lst:
-            segs = f['segments'].keys()
-            segs.sort(key=natural_keys)
-            for seg in segs:
-                n_data += f['segments/' + seg + '/left'].shape[0]
+        segs   = self.fh5['segments'].keys()
+        segs.sort(key=natural_keys)
+        for seg in segs:
+            n_data += self.fh5['segments/' + seg + '/left'].shape[0]
         return n_data
 
     
     def createDataset(self, n_samples, **kwargs):
-        super(datasetManagerCar, self).createDataset(n_samples, **kwargs)
-        self.dts[kwargs['name']].fh5_lst    = self.fh5_lst
-        self.dts[kwargs['name']]._addrs     = self._addrs
-
+        dts = super(datasetManagerCar, self).createDataset(n_samples, **kwargs)
+        dts._addrs = self._addrs
+        dts.fh5    = self.fh5
+        return dts
+        
+        
     def _dataAddressList(self):
         addLst = []
-        cnt_f = 0
-        for f in self.fh5_lst:
-            segs = f['segments'].keys()
-            segs.sort(key=natural_keys)
 
-            cnt_s = 0
-            for seg in segs:
-                n_data = f['segments/' + seg + '/motor'].shape[0]
-                
-                for cnt_n in range(n_data):
-                    label = [np.int16(cnt_f), np.int16(cnt_s), np.int16(cnt_n)]
-                    addLst.append(label)
-                cnt_s += 1
-            cnt_f += 1            
+        segs = self.fh5['segments'].keys()
+        segs.sort(key=natural_keys)
+
+        for seg in segs:
+            n_data = self.fh5['segments/' + seg + '/motor'].shape[0]
+            for cnt_n in range(n_data):
+                label = [seg, np.int16(cnt_n)]
+                addLst.append(label)
         return addLst
-        
-                
+
+
+
+
 class datasetCar(dataset):
 
     def __init__(self, n_samples, **kwargs):
@@ -186,6 +172,7 @@ class datasetCar(dataset):
         self.steer_max =  np.asarray(100, dtype=np.float32)
         self.steer_min =  np.asarray(-1.5, dtype=np.float32)
 
+        self.time_tol    = 0.7
         self.n_classes   = 5
         self.range_motor = np.linspace(0,1,self.n_classes, dtype=np.float32)
         self.range_steer = np.linspace(0,1,self.n_classes, dtype=np.float32)
@@ -193,7 +180,7 @@ class datasetCar(dataset):
         
                                
     def get_data(self,label, name):
-            data = self.fh5_lst[label[0]]['segments/' + str(label[1]) + '/' + name][label[2]]
+            data = self.fh5['segments/' + str(label[0]) + '/' + name][label[1]]
             return np.asarray(data, dtype=np.float32)                   
 
     def __getitem__(self, idx):
@@ -206,6 +193,10 @@ class datasetCar(dataset):
         else:
             label_    = self._addrs[idx]
             label_prv = self._addrs[idx-1]
+
+        consecutive = True
+        if np.abs(self.get_data(label_,"left_timestamp") - self.get_data(label_prv,"left_timestamp")) > self.time_tol:
+            consecutive=False
             
         inp = []
         inp.append(self.get_data(label_, 'left'))
@@ -216,10 +207,14 @@ class datasetCar(dataset):
         inp = np.rollaxis(inp, 2)
 
         inp = torch.from_numpy(inp)
-       
-        trg_m = (self.get_data(label_, 'motor') - self.motor_min)/(self.motor_max-self.motor_min)
-        trg_s = (self.get_data(label_, 'steer') - self.steer_min)/(self.steer_max-self.steer_min)
 
+        if consecutive:
+            trg_m = (self.get_data(label_, 'motor') - self.motor_min)/(self.motor_max-self.motor_min)
+            trg_s = (self.get_data(label_, 'steer') - self.steer_min)/(self.steer_max-self.steer_min)
+        else:
+            trg_m = 60.0
+            trg_s = 50.0
+            
         trg_m = np.argmax(np.isclose(self.range_motor, trg_m, atol=self.toll) >.5)
         trg_s = np.argmax(np.isclose(self.range_steer, trg_s, atol=self.toll) >.5)
 
@@ -227,4 +222,3 @@ class datasetCar(dataset):
         trg = int(trg_m + 5*trg_s)
         
         return inp, trg
-
