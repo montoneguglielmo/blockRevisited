@@ -71,7 +71,7 @@
 	{
 	    "init":"random",
 	    "type":"fc",
-	    "params":{"in_features":14336, "out_features":25},
+	    "params":{"in_features":16384, "out_features":25},
 	    "requires_grad": true
 	}
     },
