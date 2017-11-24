@@ -204,7 +204,8 @@ if __name__ == "__main__":
             optimizer   = nameToOptim[optimName](params, **paramsOpt)
         else:
             optimizer   = nameToOptim[optimName](params)
-            
+
+
     n_epochs      = 100
     epc_tolerance = 10
     results['n_epochs']     = n_epochs

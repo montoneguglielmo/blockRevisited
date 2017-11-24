@@ -36,7 +36,7 @@ class dataGenerator(dataGeneratorPrototip):
         
         self.testCar  = DataLoader(test_dts, batch_size=self.batch_size, shuffle=False, num_workers=1)
         self.validCar = DataLoader(valid_dts, batch_size=self.batch_size, shuffle=False, num_workers=1)
-        self.trainCar = DataLoader(train_dts, batch_size=self.batch_size, shuffle=False, num_workers=1)
+        self.trainCar = DataLoader(train_dts, batch_size=self.batch_size, shuffle=True, num_workers=1)
         
     
     def returnGen(self,sets,**kwargs):
@@ -204,7 +204,7 @@ class datasetCar(dataset):
         inp.append(self.get_data(label_prv, 'left'))
         inp.append(self.get_data(label_, 'right'))
         inp.append(self.get_data(label_prv, 'right'))
-        inp = np.concatenate(inp, axis=2)/255.
+        inp = (np.concatenate(inp, axis=2) - 127.5)/127.5
         inp = np.rollaxis(inp, 2)
 
         inp = torch.from_numpy(inp)

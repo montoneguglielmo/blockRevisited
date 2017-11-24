@@ -5,14 +5,14 @@
 	{
 	    "init": "random",
 	    "type": "conv",
-	    "params":{"in_channels":12, "out_channels": 96, "kernel_size": [5,5], "stride": 1},
+	    "params":{"in_channels":12, "out_channels": 96, "kernel_size": [7,7], "stride": 2},
 	    "actFun":"rlu",
 	    "requires_grad": true
 	},
 	"net2":
 	{
 	    "type": "max_pool",
-	    "params":{"kernel_size":3}
+	    "params":{"kernel_size":3, "stride":2}
 	},
 	"net3":
 	{
@@ -65,7 +65,7 @@
         "net9":
 	{
             "type": "max_pool",
-	    "params":{"kernel_size":3}
+	    "params":{"kernel_size":3, "stride":2}
 	},
         "output":
 	{
