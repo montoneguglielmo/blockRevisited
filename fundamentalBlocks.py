@@ -17,6 +17,7 @@ import numpy as np
 import atexit
 import gc
 import h5py
+import time
 
 class Net(nn.Module):
 
@@ -212,8 +213,8 @@ if __name__ == "__main__":
     oldAcc      = -np.inf
     epoch       = -1
     while epoch < n_epochs:  # loop over the dataset multiple times
+        start_time   = time.time()
         epoch += 1
-        
         running_loss = 0.0
         cnt_b        = 0
         total        = 0
@@ -304,7 +305,9 @@ if __name__ == "__main__":
                 total += labels.size(0)
                 correct += (predicted == labels).sum()
         accTest = 100. * (1.- float(correct)/float(total))
-        print('Epoch:%d, Train(Miss) %.3f%%, Valid(Miss) %.3f%%, Test(Miss) %.3f%%' %(epoch, accTrain, accValid, accTest))
+
+        lastTime = (time.time() - start_time)/60.0
+        print('Epoch:%d, Train(Miss) %.3f%%, Valid(Miss) %.3f%%, Test(Miss) %.3f%%. Done in %.1f' %(epoch, accTrain, accValid, accTest, lastTime))
 
         
         if accValid < oldAcc and (epoch-lastEpcBestAcc)>epc_tolerance:
@@ -312,6 +315,7 @@ if __name__ == "__main__":
         else:
             oldAcc         = accValid
             lastEpcBestAcc = epoch
+            results['runningTime']= lastTime
             results['validAcc']   = accValid
             results['testValid']  = accTest
             results['trainError'] = running_loss
