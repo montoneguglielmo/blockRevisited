@@ -12,7 +12,7 @@
 	"net2":
 	{
 	    "type": "max_pool",
-	    "params":{"kernel_size":3}
+	    "params":{"kernel_size":2}
 	},        
 	"net3":
 	{
@@ -47,7 +47,7 @@
 	{
 	    "init": "random",
 	    "type": "fc",
-	    "params":{"in_features":70, "out_features": 25},
+	    "params":{"in_features":100, "out_features": 25},
 	    "requires_grad": true
 	}
     },
