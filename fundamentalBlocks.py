@@ -6,6 +6,7 @@ import torchvision
 import torchvision.transforms as transforms
 from utils import topologyOrder, nameToActFun, nameToOptim, vanilla
 import torch.optim as optim
+from torch.optim import lr_scheduler
 import copy
 #from visualize import *
 import collections
@@ -206,6 +207,10 @@ if __name__ == "__main__":
             optimizer   = nameToOptim[optimName](params)
 
 
+    if 'lr_scheduler' in confJson:
+        param_lr     = confJson['lr_scheduler']
+        lr_scheduler = lr_scheduler.StepLR(optimizer, **param_lr)
+
     n_epochs      = 100
     epc_tolerance = 10
     results['n_epochs']     = n_epochs
@@ -216,6 +221,8 @@ if __name__ == "__main__":
     while epoch < n_epochs:  # loop over the dataset multiple times
         start_time   = time.time()
         epoch += 1
+        if 'lr_scheduler' in confJson:
+            lr_scheduler.step()
         running_loss = 0.0
         cnt_b        = 0
         total        = 0
