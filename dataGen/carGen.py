@@ -17,16 +17,16 @@ class dataGenerator(dataGeneratorPrototip):
 
     def __init__(self, **kwargs):
 
-        dtFold = '/home/guglielmo/dataset/car/Mr_Blue/'
+        dtFold = '/home/guglielmo/dataset/car/Mr_Blue/toKill/'
         
-        self.datafile  = "caffe_direct_local_sidewalks_05Dec16_15h03m35s_Mr_Blue.hdf5"
+        self.datafile  = "direct.hdf5"
         self.datafile  = dtFold + self.datafile
 
         self.batch_size = 100
 
-        self.n_test_samples  = 10000#30000
-        self.n_valid_samples = 10000#30000
-        self.n_train_samples = 40000
+        self.n_test_samples  = 25000#30000
+        self.n_valid_samples = 25000#30000
+        self.n_train_samples = 206000
         
         self.dtm  = datasetManagerCar(self.datafile)
         print "Number of total data present in the file:", self.dtm.n_data
