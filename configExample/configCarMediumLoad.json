@@ -1,0 +1,119 @@
+{
+    "configNet": {
+      "net1": {
+         "actFun": "rlu", 
+         "init": "/home/guglielmo/torchclassifier/163852", 
+         "params": {
+            "in_channels": 12, 
+            "kernel_size": [
+               7, 
+               7
+            ], 
+            "out_channels": 48, 
+            "stride": 2
+         }, 
+         "requires_grad": false, 
+         "type": "conv"
+      }, 
+      "net2": {
+         "init": "/home/guglielmo/torchclassifier/163852", 
+         "params": {
+            "kernel_size": 2
+         }, 
+         "type": "max_pool"
+      }, 
+      "net3": {
+         "actFun": "rlu", 
+         "init": "/home/guglielmo/torchclassifier/163852", 
+         "params": {
+            "in_channels": 48, 
+            "kernel_size": [
+               5, 
+               5
+            ], 
+            "out_channels": 96, 
+            "stride": 1
+            }, 
+         "requires_grad": false, 
+         "type": "conv"
+      }, 
+      "net4": {
+         "init": "/home/guglielmo/torchclassifier/163852", 
+         "params": {
+            "kernel_size": 2
+         }, 
+         "type": "max_pool"
+      }, 
+      "net5": {
+         "actFun": "rlu", 
+         "init": "/home/guglielmo/torchclassifier/163852", 
+         "params": {
+            "in_channels": 96, 
+            "kernel_size": [
+               4, 
+               4
+            ], 
+            "out_channels": 128, 
+            "stride": 1 
+         }, 
+         "requires_grad": false, 
+         "type": "conv"
+      }, 
+      "net6": {
+         "actFun": "rlu", 
+         "init": "random", 
+         "params": {
+            "in_channels": 128, 
+            "kernel_size": [
+               3, 
+               3
+            ], 
+            "out_channels": 256, 
+            "stride": 1
+         }, 
+         "requires_grad": true, 
+         "type": "conv"
+      }, 
+      "net7": {
+         "params": {
+            "kernel_size": 2
+         }, 
+         "type": "max_pool"
+      }, 
+      "output0": {
+         "init": "random", 
+         "params": {
+            "in_features": 3072, 
+            "out_features": 25
+         }, 
+         "requires_grad": true, 
+         "type": "fc"
+      }
+   }, 
+    "strctNet":
+    {
+	"net1"   :{"input":["input"], "output":["net2"]},
+	"net2"   :{"input":["net1"], "output":["net3"]},
+	"net3"   :{"input":["net2"], "output":["net4"]},
+	"net4"   :{"input":["net3"], "output":["net5"]},
+	"net5"   :{"input":["net4"], "output":["net6"]},
+	"net6"   :{"input":["net5"], "output":["net7"]},
+	"net7"   :{"input":["net6"], "output":["output0"]},
+	"output0":{"input":["net7"]}
+    },
+    "optim":
+    {
+	"name": "SGD",
+	"params":
+	{
+	    "lr":0.001,
+	    "momentum":0.9,
+	    "weight_decay":1e-5
+	}
+    },
+    "lr_scheduler":
+    {
+	"step_size":7,
+	"gamma":0.1
+    }
+}
