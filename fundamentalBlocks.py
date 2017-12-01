@@ -51,10 +51,13 @@ class Net(nn.Module):
                moduleName = netConf['moduleName']
                state_dict = {'weight': mod[moduleName + '.weight'], 'bias': mod[moduleName + '.bias']}
                self._modules[netName].load_state_dict(state_dict)
-
+               self._modules[netName].init_type = moduleName
+            else:
+               self._modules[netName].init_type = 'random'
+                
             if 'requires_grad' in netConf and not netConf['requires_grad']:
                 for p in self._modules[netName].parameters():
-                    p.requires_grad = False
+                    p.requires_grad  = False
                 
             if 'actFun' in netConf:
                self.actFuns[netName] = nameToActFun[netConf['actFun']]
@@ -104,7 +107,7 @@ class Net(nn.Module):
         lstSubNets = {name: {} for name in self._modules.keys()}
         for md in self._modules.keys():
             lstSubNets[md]['type']   = self._modules[md].type
-            lstSubNets[md]['init']   = self.fileName
+            lstSubNets[md]['init']   = self._modules[md].init_type
             lstSubNets[md]['params'] = {}
             if self._modules[md].type == 'conv':
                 lstSubNets[md]['params']['in_channels']  = self._modules[md].in_channels
@@ -176,8 +179,8 @@ if __name__ == "__main__":
     
 
     ##CREATING THE DATA GENERATOR
-    fileName = dataGeneratorName.split('.')[0].replace('/', '.')
-    dataGen = getattr(__import__(fileName, fromlist=['dataGenerator']), 'dataGenerator')()
+    fileName    = dataGeneratorName.split('.')[0].replace('/', '.')
+    dataGen     = getattr(__import__(fileName, fromlist=['dataGenerator']), 'dataGenerator')()
     testloader  = dataGen.returnGen('test')
     validloader = dataGen.returnGen('valid')
     trainloader = dataGen.returnGen('train')
@@ -336,6 +339,11 @@ if __name__ == "__main__":
             keysOpt = optimizer.state_dict()['param_groups'][0].keys()
             paramOpt = {key:optimizer.state_dict()['param_groups'][0][key] for key in keysOpt if key is not 'params'}
             results['optimizer']['params']= paramOpt
+
+            if 'lr_scheduler' in confJson:
+                results['lr_scheduler']['step_size'] = lr_scheduler.step_size
+                results['lr_scheduler']['gamma']     = lr_scheduler.gamma
+                
 
             torch.save(net.returnNetParams(), net.fileName + '.pt')
 
