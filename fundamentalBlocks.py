@@ -341,6 +341,7 @@ if __name__ == "__main__":
             results['optimizer']['params']= paramOpt
 
             if 'lr_scheduler' in confJson:
+                results['lr_scheduler']              = {}
                 results['lr_scheduler']['step_size'] = lr_scheduler.step_size
                 results['lr_scheduler']['gamma']     = lr_scheduler.gamma
                 
