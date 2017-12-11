@@ -18,25 +18,30 @@ class dataGenerator(dataGeneratorPrototip):
     def __init__(self, **kwargs):
 
         dtFold = '/home/guglielmo/dataset/car/Mr_Blue/toKill/'
-        
+
+        if 'outputKind' in kwargs:
+            self.outputKind = kwargs['outputKind']
+        else:
+            self.outputKind = 'classification'
+
         self.datafile  = "direct.hdf5"
         self.datafile  = dtFold + self.datafile
 
-        self.batch_size = 100
+        self.batch_size = 4
 
-        self.n_test_samples  = 25000#30000
-        self.n_valid_samples = 25000#30000
-        self.n_train_samples = 206000
+        self.n_test_samples  = 4#25000#30000
+        self.n_valid_samples = 200#25000#30000
+        self.n_train_samples = 200#206000
         
         self.dtm  = datasetManagerCar(self.datafile)
         print "Number of total data present in the file:", self.dtm.n_data
-        test_dts  = self.dtm.createDataset(n_samples = self.n_test_samples, name="test", datasetType=datasetCar)
-        valid_dts = self.dtm.createDataset(n_samples = self.n_valid_samples, name="valid", datasetType=datasetCar)
-        train_dts = self.dtm.createDataset(n_samples = self.n_train_samples, name="train", datasetType=datasetCar)
+        self.test_dts  = self.dtm.createDataset(n_samples = self.n_test_samples, name="test", datasetType=datasetCar, outputKind=self.outputKind)
+        self.valid_dts = self.dtm.createDataset(n_samples = self.n_valid_samples, name="valid", datasetType=datasetCar, outputKind=self.outputKind)
+        self.train_dts = self.dtm.createDataset(n_samples = self.n_train_samples, name="train", datasetType=datasetCar, outputKind=self.outputKind)
         
-        self.testCar  = DataLoader(test_dts, batch_size=self.batch_size, shuffle=False, num_workers=1)
-        self.validCar = DataLoader(valid_dts, batch_size=self.batch_size, shuffle=False, num_workers=1)
-        self.trainCar = DataLoader(train_dts, batch_size=self.batch_size, shuffle=True, num_workers=1)
+        self.testCar  = DataLoader(self.test_dts, batch_size=self.batch_size, shuffle=False, num_workers=1)
+        self.validCar = DataLoader(self.valid_dts, batch_size=self.batch_size, shuffle=False, num_workers=1)
+        self.trainCar = DataLoader(self.train_dts, batch_size=self.batch_size, shuffle=True, num_workers=1)
         
     
     def returnGen(self,sets,**kwargs):
@@ -120,7 +125,7 @@ class dataset(DatasetTorch):
 
 class datasetManagerCar(datasetManager):
 
-    def __init__(self, file_hdf):
+    def __init__(self, file_hdf, **kwargs):
         super(datasetManagerCar, self).__init__(file_hdf)
         self.fields = ['left','left_timestamp', 'right', 'motor', 'state', 'steer']
         self._addrs = self._dataAddressList()
@@ -167,10 +172,11 @@ class datasetCar(dataset):
 
     def __init__(self, n_samples, **kwargs):
         super(datasetCar, self).__init__(n_samples, **kwargs)
-        self.motor_max =  np.asarray(70, dtype=np.float32)
-        self.motor_min =  np.asarray(50, dtype=np.float32)
-        self.steer_max =  np.asarray(100, dtype=np.float32)
-        self.steer_min =  np.asarray(-1.5, dtype=np.float32)
+        self.outputKind =  kwargs['outputKind']
+        self.motor_max  =  np.asarray(70, dtype=np.float32)
+        self.motor_min  =  np.asarray(50, dtype=np.float32)
+        self.steer_max  =  np.asarray(100, dtype=np.float32)
+        self.steer_min  =  np.asarray(-1.5, dtype=np.float32)
 
         self.time_tol    = 0.7
         self.n_classes   = 5
@@ -213,13 +219,14 @@ class datasetCar(dataset):
             trg_m = (self.get_data(label_, 'motor') - self.motor_min)/(self.motor_max-self.motor_min)
             trg_s = (self.get_data(label_, 'steer') - self.steer_min)/(self.steer_max-self.steer_min)
         else:
-            trg_m = 60.0
-            trg_s = 50.0
+            trg_m = (60.0 - self.motor_min)/(self.motor_max - self.motor_min)
+            trg_s = (50.0 - self.steer_min)/(self.steer_max - self.steer_min)
             
-        trg_m = np.argmax(np.isclose(self.range_motor, trg_m, atol=self.toll) >.5)
-        trg_s = np.argmax(np.isclose(self.range_steer, trg_s, atol=self.toll) >.5)
-
-        #trg = [trg_m, trg_s]
-        trg = int(trg_m + 5*trg_s)
+        if self.outputKind == 'classification':
+            trg_m = np.argmax(np.isclose(self.range_motor, trg_m, atol=self.toll) >.5)
+            trg_s = np.argmax(np.isclose(self.range_steer, trg_s, atol=self.toll) >.5)
+            
+        trg = [trg_m, trg_s]
+        #trg = int(trg_m + 5*trg_s)
         
         return inp, trg

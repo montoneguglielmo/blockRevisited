@@ -78,9 +78,6 @@ def topologyOrder(netStr):
 
     return netOrd
 
-
-
-                      
                       
 if __name__ == "__main__":
 

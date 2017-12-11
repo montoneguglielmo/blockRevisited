@@ -242,7 +242,7 @@ if __name__ == "__main__":
                 else:
                     predicted = torch.ones(1, outputs[0].size()[0])                    
                 for out, lab in zip(outputs, labels):
-                    loss += criterion(out, lab)
+                    loss   += criterion(out, lab)
                     _, pred = torch.max(out.data, 1)
                     predicted *= (pred == lab.data).float()
                 total     += outputs[0].size(0)
@@ -268,7 +268,7 @@ if __name__ == "__main__":
         correct = 0
         total   = 0
         for inputs, labels in validloader:
-            inputs = buildVariable(inputs)
+            inputs  = buildVariable(inputs)
             outputs = net(inputs)
             if isinstance(outputs, list):
                 if torch.cuda.is_available():
