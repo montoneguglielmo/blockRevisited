@@ -1,9 +1,8 @@
 {
-   "confFile": "configExample/configCarMedium2Output.json", 
    "configNet": {
       "net1": {
          "actFun": "rlu", 
-         "init": "random", 
+         "init": "/home/guglielmo/torchclassifier/205030", 
          "params": {
             "in_channels": 12, 
             "kernel_size": [
@@ -20,7 +19,7 @@
          "type": "conv"
       }, 
       "net2": {
-         "init": "random", 
+         "init": "/home/guglielmo/torchclassifier/205030", 
          "params": {
             "kernel_size": 2
          }, 
@@ -28,7 +27,7 @@
       }, 
       "net3": {
          "actFun": "rlu", 
-         "init": "random", 
+         "init": "/home/guglielmo/torchclassifier/205030", 
          "params": {
             "in_channels": 48, 
             "kernel_size": [
@@ -45,7 +44,7 @@
          "type": "conv"
       }, 
       "net4": {
-         "init": "random", 
+         "init": "/home/guglielmo/torchclassifier/205030", 
          "params": {
             "kernel_size": 2
          }, 
@@ -53,7 +52,7 @@
       }, 
       "net5": {
          "actFun": "rlu", 
-         "init": "random", 
+         "init": "/home/guglielmo/torchclassifier/205030", 
          "params": {
             "in_channels": 96, 
             "kernel_size": [
@@ -71,7 +70,7 @@
       }, 
       "net6": {
          "actFun": "rlu", 
-         "init": "random", 
+         "init": "/home/guglielmo/torchclassifier/205030", 
          "params": {
             "in_channels": 128, 
             "kernel_size": [
@@ -95,7 +94,7 @@
          "type": "max_pool"
       }, 
       "output0": {
-         "init": "random", 
+         "init": "/home/guglielmo/torchclassifier/205030", 
          "params": {
             "in_features": 3072, 
             "out_features": 5
@@ -104,7 +103,7 @@
          "type": "fc"
       }, 
       "output1": {
-         "init": "random", 
+         "init": "/home/guglielmo/torchclassifier/205030", 
          "params": {
             "in_features": 3072, 
             "out_features": 5
