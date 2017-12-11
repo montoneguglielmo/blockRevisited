@@ -1,0 +1,218 @@
+{
+   "confFile": "configExample/configCarMedium2Output.json", 
+   "configNet": {
+      "net1": {
+         "actFun": "rlu", 
+         "init": "random", 
+         "params": {
+            "in_channels": 12, 
+            "kernel_size": [
+               7, 
+               7
+            ], 
+            "out_channels": 48, 
+            "stride": [
+               2, 
+               2
+            ]
+         }, 
+         "requires_grad": true, 
+         "type": "conv"
+      }, 
+      "net2": {
+         "init": "random", 
+         "params": {
+            "kernel_size": 2
+         }, 
+         "type": "max_pool"
+      }, 
+      "net3": {
+         "actFun": "rlu", 
+         "init": "random", 
+         "params": {
+            "in_channels": 48, 
+            "kernel_size": [
+               5, 
+               5
+            ], 
+            "out_channels": 96, 
+            "stride": [
+               1, 
+               1
+            ]
+         }, 
+         "requires_grad": true, 
+         "type": "conv"
+      }, 
+      "net4": {
+         "init": "random", 
+         "params": {
+            "kernel_size": 2
+         }, 
+         "type": "max_pool"
+      }, 
+      "net5": {
+         "actFun": "rlu", 
+         "init": "random", 
+         "params": {
+            "in_channels": 96, 
+            "kernel_size": [
+               4, 
+               4
+            ], 
+            "out_channels": 128, 
+            "stride": [
+               1, 
+               1
+            ]
+         }, 
+         "requires_grad": true, 
+         "type": "conv"
+      }, 
+      "net6": {
+         "actFun": "rlu", 
+         "init": "random", 
+         "params": {
+            "in_channels": 128, 
+            "kernel_size": [
+               3, 
+               3
+            ], 
+            "out_channels": 256, 
+            "stride": [
+               1, 
+               1
+            ]
+         }, 
+         "requires_grad": true, 
+         "type": "conv"
+      }, 
+      "net7": {
+         "init": "random", 
+         "params": {
+            "kernel_size": 2
+         }, 
+         "type": "max_pool"
+      }, 
+      "output0": {
+         "init": "random", 
+         "params": {
+            "in_features": 3072, 
+            "out_features": 5
+         }, 
+         "requires_grad": true, 
+         "type": "fc"
+      }, 
+      "output1": {
+         "init": "random", 
+         "params": {
+            "in_features": 3072, 
+            "out_features": 5
+         }, 
+         "requires_grad": true, 
+         "type": "fc"
+      }
+   }, 
+   "dataGeneratorFile": "dataGen/carGen.py", 
+   "dataset": {
+      "batch_sz": 4, 
+      "datafile": "/home/guglielmo/dataset/car/Mr_Blue/toKill/direct.hdf5", 
+      "n_test_samples": 25000, 
+      "n_train_samples": 206000, 
+      "n_valid_samples": 25000
+   }, 
+   "epc_tolerance": 10, 
+   "epoch": 100, 
+   "lr_scheduler": {
+      "gamma": 0.5, 
+      "step_size": 7
+   }, 
+   "n_epochs": 100, 
+   "name": "/home/guglielmo/torchclassifier/205030", 
+   "optimizer": {
+      "name": [
+         "SGD"
+      ], 
+      "params": {
+         "dampening": 0, 
+         "initial_lr": 0.001, 
+         "lr": 6.103515625e-08, 
+         "momentum": 0.9, 
+         "nesterov": false, 
+         "weight_decay": 1e-05
+      }
+   }, 
+   "runningTime": 23.14611763159434, 
+   "strctNet": {
+      "net1": {
+         "input": [
+            "input"
+         ], 
+         "output": [
+            "net2"
+         ]
+      }, 
+      "net2": {
+         "input": [
+            "net1"
+         ], 
+         "output": [
+            "net3"
+         ]
+      }, 
+      "net3": {
+         "input": [
+            "net2"
+         ], 
+         "output": [
+            "net4"
+         ]
+      }, 
+      "net4": {
+         "input": [
+            "net3"
+         ], 
+         "output": [
+            "net5"
+         ]
+      }, 
+      "net5": {
+         "input": [
+            "net4"
+         ], 
+         "output": [
+            "net6"
+         ]
+      }, 
+      "net6": {
+         "input": [
+            "net5"
+         ], 
+         "output": [
+            "net7"
+         ]
+      }, 
+      "net7": {
+         "input": [
+            "net6"
+         ], 
+         "output": [
+            "output0", 
+            "output1"
+         ]
+      }, 
+      "output0": {
+         "input": [
+            "net7"
+         ]
+      }, 
+      "output1": {
+         "input": [
+            "net7"
+         ]
+      }
+   }, 
+   "testValid": 11.080000000000002, 
+   "trainError": 0.0014085903190872045, 
+   "validAcc": 11.087999999999997
+}
