@@ -25,7 +25,9 @@ if __name__ == "__main__":
 
     net        = Net(lstSubNets=configNet, netStrc=strctNet, fileName='NoName')
     trg_values = np.linspace(0, 1, dataGen.test_dts.n_classes)
-
+    trg_values[0]  = trg_values[1]/4.
+    trg_values[-1] = trg_values[-2] + (trg_values[-1]-trg_values[-2])*3./4. 
+    
     rms_error = 0
     cnt_b     = 1
     for inputs, labels in testloader:

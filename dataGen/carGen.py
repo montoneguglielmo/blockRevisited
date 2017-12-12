@@ -29,7 +29,7 @@ class dataGenerator(dataGeneratorPrototip):
 
         self.batch_size = 4
 
-        self.n_test_samples  = 4#25000#30000
+        self.n_test_samples  = 400#25000#30000
         self.n_valid_samples = 200#25000#30000
         self.n_train_samples = 200#206000
         
