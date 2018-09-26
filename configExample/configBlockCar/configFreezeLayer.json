@@ -1,0 +1,95 @@
+{
+    "configNet":
+    {
+	"net1":
+	{
+	    "init": "load",
+	    "file_name": "/home/guglielmo/torchclassifier/203648",
+	    "moduleName":"net1",
+	    "type": "conv",
+	    "params":{"in_channels":12, "out_channels": 48, "kernel_size": [7,7], "stride": 2},
+	    "actFun":"rlu",
+	    "requires_grad": false
+	},
+	"net2":
+	{
+	    "type": "max_pool",
+	    "params":{"kernel_size":2}
+	},        
+	"net3":
+	{
+	    "init": "random",
+	    "type": "conv",
+	    "params":{"in_channels":48, "out_channels": 96, "kernel_size": [5,5], "stride": 1},
+	    "actFun":"rlu",
+	    "requires_grad": true
+	},
+	"net4":
+	{
+	    "type": "max_pool",
+	    "params":{"kernel_size":2}
+	},
+	"net5":
+	{
+	    "init": "random",
+	    "type": "conv",
+	    "params":{"in_channels":96, "out_channels": 128, "kernel_size": [4,4], "stride": 1},
+	    "actFun":"rlu",
+	    "requires_grad": true
+	},
+	"net6":
+	{
+	    "init": "random",
+	    "type": "conv",
+	    "params":{"in_channels":128, "out_channels": 256, "kernel_size": [3,3], "stride": 1},
+	    "actFun":"rlu",
+	    "requires_grad": true
+	},
+	"net7":
+	{
+	    "type": "max_pool",
+	    "params":{"kernel_size":2}
+	},
+	"output0":
+	{
+	    "init": "random",
+	    "type": "fc",
+	    "params":{"in_features":3072, "out_features": 5},
+	    "requires_grad": true
+	},
+	"output1":
+	{
+	    "init": "random",
+	    "type": "fc",
+	    "params":{"in_features":3072, "out_features": 5},
+	    "requires_grad": true
+	}
+    },
+    "strctNet":
+    {
+	"net1"   :{"input":["input"], "output":["net2"]},
+	"net2"   :{"input":["net1"], "output":["net3"]},
+	"net3"   :{"input":["net2"], "output":["net4"]},
+	"net4"   :{"input":["net3"], "output":["net5"]},
+	"net5"   :{"input":["net4"], "output":["net6"]},
+	"net6"   :{"input":["net5"], "output":["net7"]},
+	"net7"   :{"input":["net6"], "output":["output0", "output1"]},
+	"output0":{"input":["net7"]},
+	"output1":{"input":["net7"]}
+    },
+    "optim":
+    {
+	"name": "SGD",
+	"params":
+	{
+	    "lr":0.001,
+	    "momentum":0.9,
+	    "weight_decay":1e-5
+	}
+    },
+    "lr_scheduler":
+    {
+	"step_size":7,
+	"gamma":0.5
+    }
+}

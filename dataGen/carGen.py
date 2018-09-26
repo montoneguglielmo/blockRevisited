@@ -24,14 +24,14 @@ class dataGenerator(dataGeneratorPrototip):
         else:
             self.outputKind = 'classification'
 
-        self.datafile  = "direct.hdf5"
+        self.datafile  = "smyth.hdf5"
         self.datafile  = dtFold + self.datafile
 
         self.batch_size = 4
 
-        self.n_test_samples  = 300#25000#30000
-        self.n_valid_samples = 300#25000#30000
-        self.n_train_samples = 300#206000
+        self.n_test_samples  = 1300#direct:  25000,  smyth:1300
+        self.n_valid_samples = 1300#direct:  25000,  smyth:1300
+        self.n_train_samples = 17000#direct; 206000, smyth:1300
         
         self.dtm  = datasetManagerCar(self.datafile)
         print "Number of total data present in the file:", self.dtm.n_data
@@ -226,7 +226,7 @@ class datasetCar(dataset):
             trg_m = np.argmax(np.isclose(self.range_motor, trg_m, atol=self.toll) >.5)
             trg_s = np.argmax(np.isclose(self.range_steer, trg_s, atol=self.toll) >.5)
             
-        #trg = [trg_m, trg_s]
-        trg = int(trg_m + 5*trg_s)
+        trg = [trg_m, trg_s]
+        #trg = int(trg_m + 5*trg_s)
         
         return inp, trg
