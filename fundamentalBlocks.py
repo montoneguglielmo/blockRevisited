@@ -47,12 +47,12 @@ class Net(nn.Module):
                 self._modules[netName].type = 'max_pool'
 
             if 'init' in netConf and netConf['init'] == 'load':
-                #torch.load('205030.pt', map_location=lambda storage, loc: storage)
                mod = torch.load(netConf['file_name'] + '.pt', map_location=lambda storage, loc:storage)
                moduleName = netConf['moduleName']
                state_dict = {'weight': mod[moduleName + '.weight'], 'bias': mod[moduleName + '.bias']}
                self._modules[netName].load_state_dict(state_dict)
                self._modules[netName].init_type = moduleName
+               print "Loading network", moduleName, "from file", netConf['file_name'] 
             else:
                self._modules[netName].init_type = 'random'
                 
